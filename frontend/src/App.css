@@ -1,0 +1,197 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f1115;
+  color: white;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  padding: 60px 20px 30px;
+}
+
+.header h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.header p {
+  color: #9ca3af;
+  font-size: 18px;
+}
+
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+}
+
+.website-section,
+.chat-section {
+  background: #181b21;
+  border: 1px solid #292d35;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+
+input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #353a45;
+  background: #101218;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #6366f1;
+}
+
+button {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #6366f1;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4f46e5;
+}
+
+button:disabled {
+  background: #383c46;
+  cursor: not-allowed;
+}
+
+.success {
+  color: #4ade80;
+  margin-top: 15px;
+}
+
+.loading {
+  margin-top: 20px;
+  color: #a5b4fc;
+}
+
+.answer-box {
+  margin-top: 25px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #101218;
+  border: 1px solid #292d35;
+}
+
+.answer-box h3 {
+  margin-top: 0;
+  color: #a5b4fc;
+}
+
+.answer-box p {
+  line-height: 1.7;
+  color: #d1d5db;
+}
+
+.chat-result {
+  margin-top: 30px;
+}
+
+.user-message,
+.ai-message {
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.user-message {
+  background: #20242c;
+}
+
+.ai-message {
+  background: #151820;
+  border: 1px solid #292d35;
+}
+
+.message-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #a5b4fc;
+}
+
+.user-message p,
+.ai-message p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.sources {
+  margin-top: 25px;
+}
+
+.sources h3 {
+  margin-bottom: 12px;
+}
+
+.source-card {
+  background: #101218;
+  border: 1px solid #292d35;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.source-card p {
+  margin: 5px 0;
+}
+
+.source-text {
+  color: #b8beca;
+  line-height: 1.5;
+}
+
+.source-card small {
+  color: #737b8c;
+}
+
+.error-box {
+  margin-bottom: 20px;
+  padding: 15px 18px;
+  border-radius: 10px;
+  background: #2a1717;
+  border: 1px solid #5c2929;
+  color: #fca5a5;
+}
+
+.error-box strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.error-box p {
+  margin: 0;
+  line-height: 1.5;
+}
