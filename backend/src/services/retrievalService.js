@@ -7,7 +7,14 @@ const {
 async function retrieveRelevantChunks(question, websiteId) {
   const questionEmbedding = await createEmbedding(question);
 
-  const results = await searchSimilarChunks(questionEmbedding, websiteId, 3);
+  const results = await searchSimilarChunks(
+    questionEmbedding, 
+    websiteId, 
+    5);
+
+    if(results.length === 0){
+      return [];
+    }
 
   const chunks = results.map(result => {
     return {

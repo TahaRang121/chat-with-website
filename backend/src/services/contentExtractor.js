@@ -1,13 +1,24 @@
 const cheerio = require("cheerio");
-function extractText(html){
-    const $ = cheerio.load(html);
-    //remove elements that dontcontain usful page content
-    $("script, style, noscript, iframe, header, footer, nav, aside").remove();
-    //extract text from remaining html
-    const text = $("body").text();
-    return text;
+function extractText(html) {
+  const $ = cheerio.load(html);
+
+  // Remove elements that usually do not contain useful article content
+  $(
+    "script, style, nav, footer, header, noscript, " +
+    "aside, form, iframe, svg"
+  ).remove();
+
+  // Prefer the main article/content area when available
+  const mainContent =
+    $("main").text() ||
+    $("article").text() ||
+    $("#mw-content-text").text() ||
+    $(".mw-parser-output").text() ||
+    $("body").text();
+
+  return mainContent;
 }
 
-module.exports ={
-    extractText
+module.exports = {
+  extractText
 };

@@ -45,10 +45,12 @@ async function storeChunks(chunks, embeddings, url, websiteId) {
 async function searchSimilarChunks(
   queryEmbedding,
   websiteId,
-  limit = 3
+  limit = 5
 ) {
   const response = await qdrant.query(COLLECTION_NAME, {
     query: queryEmbedding,
+
+    limit: limit,
 
     filter: {
       must: [
@@ -61,11 +63,23 @@ async function searchSimilarChunks(
       ]
     },
 
-    limit: limit,
     with_payload: true
   });
 
-  return response.points;
+  console.log("Qdrant response:", response);
+
+  const results = response.points || response;
+
+  console.log("Qdrant results:", results);
+  console.log("Is array:", Array.isArray(results));
+
+  const filteredResults = results.filter(
+    result => result.score >= 0.30
+  );
+
+  console.log("Filtered results:", filteredResults);
+
+  return filteredResults;
 }
 
 async function resetCollection() {

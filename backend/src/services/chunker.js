@@ -1,16 +1,38 @@
 function chunkText(text, chunkSize = 1000, overlap = 200) {
+  const paragraphs = text
+    .split(/\n+/)
+    .map(paragraph => paragraph.trim())
+    .filter(paragraph => paragraph.length > 0);
+
   const chunks = [];
 
-  let start = 0;
+  let currentChunk = "";
 
-  while (start < text.length) {
-    const end = start + chunkSize;
+  for (const paragraph of paragraphs) {
 
-    const chunk = text.slice(start, end);
+    if (
+      currentChunk.length + paragraph.length + 1
+      <= chunkSize
+    ) {
+      currentChunk +=
+        (currentChunk ? "\n" : "") + paragraph;
+    } else {
 
-    chunks.push(chunk);
+      if (currentChunk) {
+        chunks.push(currentChunk);
+      }
 
-    start += chunkSize - overlap;
+      const previousText = currentChunk.slice(-overlap);
+
+      currentChunk =
+        previousText +
+        (previousText ? "\n" : "") +
+        paragraph;
+    }
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk);
   }
 
   return chunks;

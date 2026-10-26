@@ -9,14 +9,17 @@ function App() {
 
   const [processingWebsite, setProcessingWebsite] = useState(false);
   const [askingQuestion, setAskingQuestion] = useState(false);
+  const [processingStep, setProcessingStep] = useState("");
   const [error, setError] = useState("");
 
   async function processWebsite() {
     try {
       setProcessingWebsite(true);
+      setProcessingStep("Reading website...");
       setError("");
       setMessages([]);
 
+      setProcessingStep("Reading website, creating embeddings, and building knowledge base...");
       const response = await fetch("http://localhost:3000/website", {
         method: "POST",
 
@@ -45,6 +48,7 @@ function App() {
 
     } finally {
       setProcessingWebsite(false);
+      setProcessingStep("");
     }
   }
 
@@ -143,7 +147,11 @@ function App() {
 
           {processingWebsite && (
             <div className="loading">
-              Reading website and creating knowledge base...
+              <div className="loading-spinner"></div>
+              <div>
+                <strong>Processing website</strong>
+                <p>{processingStep}</p>
+              </div>
             </div>
           )}
 
@@ -249,11 +257,22 @@ function App() {
                           <p className="source-text">
                             {source.text}
                           </p>
-
-                          <small>
-                            Relevance score:{" "}
-                            {source.score.toFixed(3)}
-                          </small>
+                          <div className="source-meta">
+                            <small>
+                              Relevance: {source.score.toFixed(3)}
+                            </small>
+                            <small>
+                              Chunk: {source.chunkIndex + 1}
+                            </small>
+                            <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            >
+                              Open website
+                            </a>
+                            
+                          </div>
 
                         </div>
 

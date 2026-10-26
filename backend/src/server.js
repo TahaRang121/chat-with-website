@@ -27,12 +27,30 @@ app.get("/", (req, res) => {
 
 app.post("/website", async (req, res) => {
   const { url } = req.body;
-  const websiteId = uuidv4();
-  console.log("Received URL:", url);
-  console.log("Website ID:", websiteId);
+
+  if (!url || !url.trim()) {
+    return res.status(400).json({
+      message: "Website URL is required"
+    });
+  }
+
+  const normalizedUrl = url.trim();
 
   try {
-    const response = await fetch(url);
+    new URL(normalizedUrl);
+
+    const websiteId = uuidv4();
+
+    console.log("Received URL:", normalizedUrl);
+    console.log("Website ID:", websiteId);
+
+    const response = await fetch(normalizedUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `Unable to access website. Server returned ${response.status}.`
+      );
+    }
 
     const html = await response.text();
 
@@ -40,25 +58,46 @@ app.post("/website", async (req, res) => {
     console.log("HTML length:", html.length);
 
     const text = extractText(html);
+
     console.log("Text extracted successfully!");
     console.log("Text length:", text.length);
-    
+
     const cleanedText = cleanText(text);
-    console.log("text cleaned successfully!");
+
+    if (!cleanedText) {
+      return res.status(400).json({
+        message: "This website does not contain any useful text to process."
+      });
+    }
+
+    console.log("Text cleaned successfully!");
     console.log("Cleaned text length:", cleanedText.length);
 
     const chunks = chunkText(cleanedText);
-    console.log("Number os chunks:", chunks.length);
+
+    if (chunks.length === 0) {
+      return res.status(400).json({
+        message: "Could not create any usable content chunks from this website."
+      });
+    }
+
+    console.log("Number of chunks:", chunks.length);
 
     const embeddings = await createEmbeddings(chunks);
+
     console.log("Embeddings created:", embeddings.length);
     console.log("Embedding dimensions:", embeddings[0].length);
 
-    await storeChunks(chunks, embeddings, url, websiteId);
+    await storeChunks(
+      chunks,
+      embeddings,
+      normalizedUrl,
+      websiteId
+    );
 
     res.json({
       message: "Website processed successfully",
-      url: url,
+      url: normalizedUrl,
       websiteId: websiteId,
       numberOfChunks: chunks.length,
       numberOfEmbeddings: embeddings.length,
@@ -66,10 +105,10 @@ app.post("/website", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Website processing Error:", error.message);
 
     res.status(500).json({
-      message: "Failed to process website",
+      message: "We couldn't process this website.",
       error: error.message
     });
   }
@@ -81,9 +120,14 @@ app.post("/ask", async (req, res) => {
   try {
     const { websiteId, question } = req.body;
 
-    if (!websiteId || !question) {
+    if (!websiteId || !websiteId.trim()) {
       return res.status(400).json({
-        message: "websiteId and question are required"
+        message: "Please process a website before asking a question."
+      });
+    }
+    if (!question || !question.trim()) {
+      return res.status(400).json({
+        message: "Please enter a question."
       });
     }
 
@@ -93,10 +137,20 @@ app.post("/ask", async (req, res) => {
       websiteId
     );
 
+    if(chunks.length === 0){
+      return res.json({
+        question,
+        answer: "I couldn't find that information on the website.",
+        sources: []
+      });
+    }
+
     // Create context for Gemini
     const context = chunks
-      .map(chunk => chunk.text)
-      .join("\n\n");
+    .map((chunk, index) => {
+      return `SOURCE ${index + 1}:\n${chunk.text}`;
+    })
+    .join("\n\n");
 
     // Generate answer
     const answer = await generateAnswer(
@@ -114,7 +168,7 @@ app.post("/ask", async (req, res) => {
     console.error("RAG error:", error.message);
 
     res.status(500).json({
-      message: "Failed to generate answer",
+      message: "We couldn't generate an answer right now.",
       error: error.message
     });
   }

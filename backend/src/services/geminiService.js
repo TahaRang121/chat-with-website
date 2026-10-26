@@ -6,12 +6,15 @@ const ai = new GoogleGenAI({
 
 async function generateAnswer(question, context) {
   const prompt = `
-You are a helpful assistant answering questions about a website.
+You are a helpful assistant answering questions about a specific website.
 
-Use ONLY the information provided in the context below.
-
-If the answer is not present in the context, say:
+IMPORTANT RULES:
+1. Use ONLY the information provided in the CONTEXT.
+2. Do NOT use your own general knowledge.
+3. Do NOT make up or guess information.
+4. If the answer is not clearly present in the CONTEXT, say exactly:
 "I couldn't find that information on the website."
+5. Answer clearly and concisely.
 
 Context:
 ${context}
