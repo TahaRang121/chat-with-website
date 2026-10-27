@@ -8,6 +8,14 @@ const { retrieveRelevantChunks } = require("./services/retrievalService");
 const {
   initializeDatabase
 } = require("./services/vectorDatabase");
+const {
+  generateSummary,
+  selectRepresentativeChunks
+} = require("./services/summaryService");
+const {
+  saveSummary
+} = require("./services/summaryStore");
+
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const cors = require("cors");
@@ -95,13 +103,26 @@ app.post("/website", async (req, res) => {
       websiteId
     );
 
+    const representativeChunks = selectRepresentativeChunks(chunks);
+    const summaryContext = representativeChunks.join("\n\n");
+    let summary = "";
+    try {
+      summary = await generateSummary(summaryContext);
+    } catch (error) {
+      console.error("Summary generation failed:", error.message);
+      summary =
+        "A summary could not be generated right now. You can still ask questions about this website.";
+      }
+      saveSummary(websiteId, summary);
+
     res.json({
       message: "Website processed successfully",
       url: normalizedUrl,
       websiteId: websiteId,
       numberOfChunks: chunks.length,
       numberOfEmbeddings: embeddings.length,
-      embeddingDimensions: embeddings[0].length
+      embeddingDimensions: embeddings[0].length,
+      summary
     });
 
   } catch (error) {
