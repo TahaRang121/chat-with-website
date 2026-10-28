@@ -6,17 +6,28 @@ const ai = new GoogleGenAI({
 
 async function generateSummary(context) {
   const prompt = `
-You are creating a concise overview of a website or article.
-
-Use ONLY the information provided in the context.
-
-Create a clear summary that explains:
-- What the website or article is mainly about
-- Its main topics or ideas
-- Important concepts discussed
-
-Do not add information that is not present in the context.
-Do not make assumptions.
+  You are creating a high-quality overview of a website or article.
+  
+  Use ONLY the information provided in the CONTEXT.
+  
+  Create a concise but informative summary.
+  
+  Your response should contain:
+  
+  1. A short introduction explaining what the article is mainly about.
+  2. The major topics or sections discussed.
+  3. The most important concepts, ideas, or facts.
+  4. A short concluding statement explaining the overall purpose or message.
+  
+  Rules:
+  - Use only the provided context.
+  - Do not use outside knowledge.
+  - Do not invent information.
+  - Do not mention that you were given context.
+  - Do not say "according to the context".
+  - Keep the answer easy to understand.
+  - Avoid unnecessary repetition.
+  - Use short paragraphs and bullet points where useful.
 
 CONTEXT:
 ${context}

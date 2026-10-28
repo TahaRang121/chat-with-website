@@ -122,29 +122,68 @@ function App() {
         )}
 
         <section className="website-section">
+  <div className="section-heading">
+    <div>
+      <span className="step-label">STEP 01</span>
+      <h2>Add a Website</h2>
+      <p>
+        Enter the URL of any website you want to chat with.
+      </p>
+    </div>
+  </div>
 
-          <h2>1. Add a Website</h2>
+  <div className="website-input">
+    <div className="url-input-wrapper">
+      <span className="url-icon">↗</span>
 
-          <div className="input-row">
+      <input
+        type="text"
+        placeholder="https://example.com"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+      />
+    </div>
 
-            <input
-              type="text"
-              placeholder="https://example.com"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
+    <button
+      className="process-button"
+      onClick={processWebsite}
+      disabled={!url.trim() || processingWebsite}
+    >
+      {processingWebsite
+        ? "Processing..."
+        : "Process Website"}
+    </button>
+  </div>
 
-            <button
-              onClick={processWebsite}
-              disabled={!url.trim() || processingWebsite}
-            >
-              {processingWebsite
-                ? "Processing..."
-                : "Process Website"}
-            </button>
+  {processingWebsite && (
+    <div className="processing-state">
+      <div className="spinner"></div>
 
-          </div>
+      <div>
+        <strong>Building your knowledge base</strong>
+        <p>
+          Reading the website and preparing it for AI...
+        </p>
+      </div>
+    </div>
+  )}
 
+  {websiteId && !processingWebsite && (
+    <p className="success">
+      ✓ Website processed successfully
+    </p>
+  )}
+</section>
+<section className="chat-section">
+  <div className="section-heading">
+    <div>
+      <span className="step-label">STEP 02</span>
+      <h2>Ask a Question</h2>
+      <p>
+        Ask anything you want to know about the website.
+      </p>
+    </div>
+  </div>
           {processingWebsite && (
             <div className="loading">
               <div className="loading-spinner"></div>
@@ -292,7 +331,6 @@ function App() {
         </section>
 
       </main>
-
     </div>
   );
 }

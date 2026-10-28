@@ -13,8 +13,14 @@ const {
   selectRepresentativeChunks
 } = require("./services/summaryService");
 const {
-  saveSummary
+  saveSummary,
+  getSummary
 } = require("./services/summaryStore");
+
+const {
+  isBroadQuestion
+} = require("./services/questionClassifier");
+
 
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
@@ -27,10 +33,17 @@ app.use(express.json());
 const PORT = 3000;
 
 // Allow server to understand JSON request bodies
-app.use(express.json());
-
 app.get("/", (req, res) => {
-  res.send("Chat with Website API is running!");
+  res.json({
+    status: "ok",
+    message: "Chat with Website API is running!"
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy"
+  });
 });
 
 app.post("/website", async (req, res) => {
@@ -113,7 +126,7 @@ app.post("/website", async (req, res) => {
       summary =
         "A summary could not be generated right now. You can still ask questions about this website.";
       }
-      saveSummary(websiteId, summary);
+      await saveSummary(websiteId, summary);
 
     res.json({
       message: "Website processed successfully",
@@ -153,19 +166,42 @@ app.post("/ask", async (req, res) => {
     }
 
     // Retrieve relevant chunks
-    const chunks = await retrieveRelevantChunks(
-      question,
-      websiteId
-    );
+    const broadQuestion = isBroadQuestion(question);
+    if (broadQuestion) {
+      const summary = getSummary(websiteId);
+      if (!summary) {
+        return res.json({
+          question,
+          answer:
+            "I don't have a summary available for this website yet.",
+          sources: []
+    });
+  }
 
-    if(chunks.length === 0){
-      return res.json({
-        question,
-        answer: "I couldn't find that information on the website.",
-        sources: []
-      });
-    }
+  const answer = await generateAnswer(
+    question,
+    `WEBSITE SUMMARY:\n${summary}`
+  );
 
+  return res.json({
+    question,
+    answer,
+    sources: []
+  });
+}
+
+const chunks = await retrieveRelevantChunks(
+  question,
+  websiteId
+);
+
+if (chunks.length === 0) {
+  return res.json({
+    question,
+    answer: "I couldn't find that information on the website.",
+    sources: []
+  });
+}
     // Create context for Gemini
     const context = chunks
     .map((chunk, index) => {

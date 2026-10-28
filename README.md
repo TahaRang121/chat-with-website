@@ -1,4 +1,4 @@
-# Chat With Website
+3# Chat With Website
 
 Chat With Website is a local full-stack application that lets you enter a website URL and ask questions about its content. The backend fetches and cleans the page, splits it into overlapping chunks, creates embeddings, stores them in Qdrant, and uses retrieval-augmented generation (RAG) with Gemini to answer questions from the retrieved content.
 
