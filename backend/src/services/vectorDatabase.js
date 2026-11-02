@@ -12,8 +12,9 @@ async function initializeQdrant() {
   QdrantClient = qdrantModule.QdrantClient;
 
   qdrant = new QdrantClient({
-    url: "http://localhost:6333"
-  });
+  url: process.env.QDRANT_URL,
+  apiKey: process.env.QDRANT_API_KEY
+});
 
   console.log("Qdrant client initialized!");
 }
@@ -26,7 +27,14 @@ async function createCollection() {
     }
   });
 
+  await qdrant.createPayloadIndex(COLLECTION_NAME, {
+    field_name: "websiteId",
+    field_schema: "keyword",
+    wait: true
+  });
+
   console.log("Qdrant collection created!");
+  console.log("websiteId payload index created!");
 }
 
 async function createSummaryCollection() {
@@ -156,7 +164,7 @@ async function saveSummary(
         {
           id: websiteId,
 
-          vector: [0],
+          vector: [1],
 
           payload: {
             websiteId: websiteId,
@@ -196,10 +204,20 @@ async function initializeDatabase() {
       "Qdrant collection initialized!"
     );
   } else {
-    console.log(
-      "Qdrant collection already exists!"
-    );
-  }
+  console.log(
+    "Qdrant collection already exists!"
+  );
+
+  await qdrant.createPayloadIndex(COLLECTION_NAME, {
+    field_name: "websiteId",
+    field_schema: "keyword",
+    wait: true
+  });
+
+  console.log(
+    "websiteId payload index initialized!"
+  );
+}
 
   // Check summary collection
   const summaryExists =

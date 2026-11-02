@@ -1,7 +1,8 @@
 const { QdrantClient } = require("@qdrant/js-client-rest");
 
 const qdrant = new QdrantClient({
-  url: "http://localhost:6333"
+  url: process.env.QDRANT_URL,
+  apiKey: process.env.QDRANT_API_KEY
 });
 
 const SUMMARY_COLLECTION_NAME = "website_summaries";
@@ -14,7 +15,7 @@ async function saveSummary(websiteId, summary) {
       {
         id: websiteId,
 
-        vector: [0],
+        vector: [1],
 
         payload: {
           websiteId: websiteId,

@@ -245,7 +245,7 @@ if (chunks.length === 0) {
     });
 
   } catch (error) {
-    console.error("RAG error:", error.message);
+    console.error("RAG error:", error);
 
     res.status(500).json({
       message: "We couldn't generate an answer right now.",
@@ -258,8 +258,8 @@ async function startServer() {
   try {
     await initializeDatabase();
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
     });
 
   } catch (error) {
