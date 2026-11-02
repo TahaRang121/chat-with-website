@@ -1,102 +1,320 @@
-3# Chat With Website
+# 🌐 Chat With Website
 
-Chat With Website is a local full-stack application that lets you enter a website URL and ask questions about its content. The backend fetches and cleans the page, splits it into overlapping chunks, creates embeddings, stores them in Qdrant, and uses retrieval-augmented generation (RAG) with Gemini to answer questions from the retrieved content.
+> Turn any public website into an interactive knowledge base and ask questions about its content using RAG.
 
-## Features
+🔗 **Live Demo:** https://chat-with-website-zeta.vercel.app
 
-- Process a public website URL and create a searchable knowledge base.
-- Extract useful page text while removing navigation, scripts, styles, forms, and other non-content elements.
-- Generate normalized embeddings with `Xenova/all-MiniLM-L6-v2`.
-- Store and search website chunks in a local Qdrant collection named `website_chunks`.
-- Generate a website summary during processing.
-- Ask follow-up questions and view the retrieved source chunks and relevance scores.
+📦 **GitHub:** https://github.com/TahaRang121/chat-with-website
 
-## Project structure
+---
+
+## 📌 Overview
+
+**Chat With Website** is a full-stack RAG (Retrieval-Augmented Generation) application that allows users to enter a public website URL and ask questions about its content.
+
+The application:
+
+1. Fetches the website
+2. Extracts readable content
+3. Cleans and chunks the text
+4. Generates vector embeddings
+5. Stores the chunks in Qdrant
+6. Retrieves the most relevant content for a question
+7. Uses Gemini to generate an answer based only on the retrieved website content
+
+The goal is to make website content searchable and conversational without requiring users to manually read through large pages.
+
+---
+
+## ✨ Features
+
+- 🌐 Process public website URLs
+- 🧹 Extract and clean readable website content
+- ✂️ Split content into overlapping chunks
+- 🧠 Generate embeddings using `Xenova/all-MiniLM-L6-v2`
+- 🔎 Semantic search using Qdrant
+- 🤖 AI-generated answers using Google Gemini
+- 📚 Retrieval-Augmented Generation (RAG)
+- 🔗 Display relevant source information
+- ⚡ React + Vite frontend
+- 🚀 Deployed frontend and backend
+- ☁️ Qdrant Cloud vector database
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React
+- Vite
+- JavaScript
+- CSS
+
+### Backend
+- Node.js
+- Express.js
+- Cheerio
+- Transformers.js
+
+### AI / RAG
+- Google Gemini API
+- `Xenova/all-MiniLM-L6-v2`
+- Retrieval-Augmented Generation (RAG)
+
+### Database
+- Qdrant Cloud
+
+### Deployment
+- Vercel — Frontend
+- Render — Backend
+- Qdrant Cloud — Vector Database
+
+---
+
+## 🏗️ Architecture
 
 ```text
-.
-├── backend/
-│   └── src/
-│       ├── server.js
-│       └── services/
-└── frontend/
-    └── src/
+                    ┌──────────────────┐
+                    │      User        │
+                    │  Website URL +   │
+                    │     Question     │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ React + Vite     │
+                    │    Frontend      │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Express / Node   │
+                    │     Backend      │
+                    └────────┬─────────┘
+                             │
+             ┌───────────────┴────────────────┐
+             │                                │
+             ▼                                ▼
+    ┌─────────────────┐              ┌─────────────────┐
+    │ Website Content │              │    Question     │
+    │ Extraction      │              │    Embedding    │
+    └────────┬────────┘              └────────┬────────┘
+             │                                │
+             ▼                                │
+    ┌─────────────────┐                       │
+    │ Cleaning +      │                       │
+    │ Chunking        │                       │
+    └────────┬────────┘                       │
+             │                                │
+             ▼                                ▼
+    ┌─────────────────────────────────────────────────┐
+    │                  Qdrant Cloud                   │
+    │              Vector Search / Retrieval          │
+    └────────────────────────┬────────────────────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Relevant Website │
+                    │     Context      │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │  Google Gemini   │
+                    │  Answer Generation│
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │     Answer       │
+                    │   + Sources      │
+                    └──────────────────┘
 ```
 
-The backend is an Express API. The frontend is a React application built with Vite.
+---
 
-## Prerequisites
+## 🔄 RAG Pipeline
 
-- Node.js 18 or newer (the backend uses the built-in `fetch` API).
-- npm.
-- A running Qdrant instance at `http://localhost:6333`.
-- A Google Gemini API key.
+```text
+Website URL
+    ↓
+Fetch HTML
+    ↓
+Extract readable text
+    ↓
+Clean text
+    ↓
+Create chunks
+    ↓
+Generate embeddings
+    ↓
+Store in Qdrant
+    ↓
+User asks a question
+    ↓
+Generate question embedding
+    ↓
+Semantic similarity search
+    ↓
+Retrieve relevant chunks
+    ↓
+Send context + question to Gemini
+    ↓
+Generate grounded answer
+```
 
-The backend creates the `website_chunks` collection automatically on startup when it does not already exist. The collection uses 384-dimensional vectors and cosine similarity.
+---
 
-## Configuration
+## 📁 Project Structure
 
-Create or update `backend/.env`:
+```text
+chat-with-website/
+│
+├── backend/
+│   ├── src/
+│   │   ├── server.js
+│   │   └── services/
+│   │       ├── contentExtractor.js
+│   │       ├── textCleaner.js
+│   │       ├── chunker.js
+│   │       ├── embeddingService.js
+│   │       ├── vectorDatabase.js
+│   │       ├── retrievalService.js
+│   │       ├── geminiService.js
+│   │       ├── summaryService.js
+│   │       ├── summaryStore.js
+│   │       └── questionClassifier.js
+│   │
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   └── ...
+│   ├── package.json
+│   └── .env
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+## ⚙️ Local Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/TahaRang121/chat-with-website.git
+cd chat-with-website
+```
+
+### 2. Install backend dependencies
+
+```bash
+cd backend
+npm install
+```
+
+### 3. Configure backend environment variables
+
+Create:
+
+```text
+backend/.env
+```
+
+Add:
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key
+QDRANT_URL=your_qdrant_cloud_url
+QDRANT_API_KEY=your_qdrant_api_key
 ```
 
-Keep the real API key private. The `.env` file is ignored by Git and should not be committed or copied into the frontend.
+Never commit real API keys to GitHub.
 
-Qdrant is currently configured directly in `backend/src/services/vectorDatabase.js` at `http://localhost:6333`. The frontend is currently configured to call the backend at `http://localhost:3000`. Update the corresponding source configuration if either service runs elsewhere.
-
-## Installation
-
-Install the root dependencies and the dependencies for each application:
+### 4. Start the backend
 
 ```bash
-npm install
-cd backend
-npm install
-cd ../frontend
-npm install
-```
-
-## Running the application
-
-Start Qdrant first, then open two terminals from the project root.
-
-### Backend
-
-```bash
-cd backend
 node src/server.js
 ```
 
-The API starts at `http://localhost:3000`.
+The backend will run locally on:
 
-### Frontend
+```text
+http://localhost:3000
+```
+
+Health check:
+
+```text
+http://localhost:3000/health
+```
+
+### 5. Start the frontend
+
+Open another terminal:
 
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 
-Open the URL printed by Vite, usually `http://localhost:5173`.
+The frontend will normally run on:
 
-For a production frontend build:
-
-```bash
-cd frontend
-npm run build
-npm run preview
+```text
+http://localhost:5173
 ```
 
-## API
+Configure the frontend environment:
 
-### `GET /`
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-Health check. Returns `Chat with Website API is running!`.
+---
 
-### `POST /website`
+## 🌍 Deployment
 
-Fetch and process a website.
+The project is deployed using:
+
+| Component | Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render |
+| Vector Database | Qdrant Cloud |
+| AI | Google Gemini |
+
+### Live Application
+
+👉 https://chat-with-website-zeta.vercel.app
+
+---
+
+## 🔌 API Endpoints
+
+### Health Check
+
+```http
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+### Process Website
+
+```http
+POST /website
+```
 
 Request:
 
@@ -106,80 +324,86 @@ Request:
 }
 ```
 
-Successful responses include the generated website ID, chunk counts, embedding dimensions, and a summary:
+The API processes the website, creates embeddings, and stores the content in Qdrant.
 
-```json
-{
-  "message": "Website processed successfully",
-  "url": "https://example.com",
-  "websiteId": "generated-uuid",
-  "numberOfChunks": 10,
-  "numberOfEmbeddings": 10,
-  "embeddingDimensions": 384,
-  "summary": "..."
-}
+### Ask a Question
+
+```http
+POST /ask
 ```
-
-The returned `websiteId` is required when asking questions.
-
-### `POST /ask`
-
-Retrieve relevant chunks for a website and generate an answer with Gemini.
 
 Request:
 
 ```json
 {
-  "websiteId": "generated-uuid",
+  "websiteId": "generated-website-id",
   "question": "What is this website about?"
 }
 ```
 
-The response contains the question, answer, and matching source chunks. Source fields are returned by Qdrant and may be nested under `payload`:
+The backend retrieves relevant website content and sends the retrieved context to Gemini for answer generation.
 
-```json
-{
-  "question": "What is this website about?",
-  "answer": "...",
-  "sources": [
-    {
-      "score": 0.82,
-      "payload": {
-        "websiteId": "generated-uuid",
-        "url": "https://example.com",
-        "chunkIndex": 0,
-        "text": "..."
-      }
-    }
-  ]
-}
-```
+---
 
-## Processing flow
+## 🧠 Why RAG?
 
-1. The frontend sends a URL to `POST /website`.
-2. The backend fetches the URL and extracts readable content.
-3. Text is cleaned and divided into chunks of about 1,000 characters with 200 characters of overlap.
-4. Each chunk is embedded and stored in Qdrant under a generated website ID.
-5. Representative chunks are sent to Gemini to create a summary.
-6. A question is embedded and matched against that website’s chunks.
-7. The retrieved context is sent to Gemini, which returns an answer and the matching sources.
+Instead of sending an entire website directly to an AI model, the application uses **Retrieval-Augmented Generation**.
 
-## Notes and limitations
+Only the most relevant chunks are retrieved from the vector database and provided to the AI model.
 
-- Only content accessible through a server-side HTTP fetch can be processed; client-rendered pages may not contain their final content in the fetched HTML.
-- Website summaries are kept in memory and are lost when the backend restarts. Search chunks remain in Qdrant.
-- The backend filters search results below a relevance score of `0.30`.
-- The frontend currently uses hardcoded local backend and Qdrant URLs.
-- The backend package does not define a `start` script; use `node src/server.js` as shown above.
+This helps the system:
 
-## Available frontend scripts
+- Focus on relevant website information
+- Reduce unnecessary context
+- Ground answers in the processed website content
+- Avoid relying on unrelated general knowledge
 
-From `frontend/`:
+---
 
-```bash
-npm run dev      # Start the Vite development server
-npm run build    # Create a production build
-npm run lint     # Run ESLint
-npm run preview  # Preview the production build
-```
+## ⚠️ Current Limitations
+
+- The application works best with publicly accessible websites.
+- Server-side fetching may not capture content rendered entirely through client-side JavaScript.
+- Website content can change after it has been processed.
+- AI responses depend on the quality of the extracted and retrieved content.
+- Some AI requests may temporarily fail if the model provider is experiencing high demand.
+
+---
+
+## 🚀 Future Improvements
+
+- [ ] Support multiple pages from the same website
+- [ ] Improve JavaScript-rendered website extraction
+- [ ] Add conversation history
+- [ ] Improve summary generation and fallback handling
+- [ ] Add authentication
+- [ ] Add persistent website management
+- [ ] Improve source citations
+- [ ] Add custom domains
+- [ ] Add streaming AI responses
+- [ ] Improve UI/UX
+
+---
+
+## 👨‍💻 Author
+
+**Taha Rangwala**
+
+B.Tech CSE — Data Science
+
+Built as a practical project to understand:
+
+- Web scraping and content extraction
+- Text processing
+- Embeddings
+- Vector databases
+- Retrieval-Augmented Generation
+- LLM integration
+- Full-stack development
+- Cloud deployment
+
+---
+
+## ⭐ If you find this project interesting
+
+Feel free to explore the code, try the live demo, or star the repository.
