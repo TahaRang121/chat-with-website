@@ -109,24 +109,12 @@ app.post("/website", async (req, res) => {
     console.log("Embeddings created:", embeddings.length);
     console.log("Embedding dimensions:", embeddings[0].length);
 
-    await storeChunks(
+    await storeChunks(  
       chunks,
       embeddings,
       normalizedUrl,
       websiteId
     );
-
-    const representativeChunks = selectRepresentativeChunks(chunks);
-    const summaryContext = representativeChunks.join("\n\n");
-    let summary = "";
-    try {
-      summary = await generateSummary(summaryContext);
-    } catch (error) {
-      console.error("Summary generation failed:", error.message);
-      summary =
-        "A summary could not be generated right now. You can still ask questions about this website.";
-      }
-      await saveSummary(websiteId, summary);
 
     res.json({
       message: "Website processed successfully",
@@ -134,8 +122,7 @@ app.post("/website", async (req, res) => {
       websiteId: websiteId,
       numberOfChunks: chunks.length,
       numberOfEmbeddings: embeddings.length,
-      embeddingDimensions: embeddings[0].length,
-      summary
+      embeddingDimensions: embeddings[0].length
     });
 
   } catch (error) {
@@ -168,14 +155,50 @@ app.post("/ask", async (req, res) => {
     // Retrieve relevant chunks
     const broadQuestion = isBroadQuestion(question);
     if (broadQuestion) {
-      const summary = getSummary(websiteId);
-      if (!summary) {
-        return res.json({
-          question,
-          answer:
-            "I don't have a summary available for this website yet.",
-          sources: []
-    });
+  let summary = await getSummary(websiteId);
+
+  if (!summary) {
+    const chunks = await retrieveRelevantChunks(
+      question,
+      websiteId
+    );
+
+    if (chunks.length === 0) {
+      return res.json({
+        question,
+        answer:
+          "I couldn't find enough information on the website to create a summary.",
+        sources: []
+      });
+    }
+
+    const representativeChunks = selectRepresentativeChunks(
+      chunks.map(chunk => chunk.text)
+    );
+
+    const summaryContext =
+      representativeChunks.join("\n\n");
+
+    try {
+      summary = await generateSummary(summaryContext);
+
+      await saveSummary(
+        websiteId,
+        summary
+      );
+    } catch (error) {
+      console.error(
+        "Summary generation failed:",
+        error.message
+      );
+
+      return res.json({
+        question,
+        answer:
+          "I couldn't generate a summary right now. Please try again in a moment.",
+        sources: []
+      });
+    }
   }
 
   const answer = await generateAnswer(

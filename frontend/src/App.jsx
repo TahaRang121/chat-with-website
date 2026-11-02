@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "./App.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const [url, setUrl] = useState("");
   const [websiteId, setWebsiteId] = useState("");
@@ -20,7 +22,7 @@ function App() {
       setMessages([]);
 
       setProcessingStep("Reading website, creating embeddings, and building knowledge base...");
-      const response = await fetch("http://localhost:3000/website", {
+      const response = await fetch(`${API_URL}/website`, {
         method: "POST",
 
         headers: {
@@ -63,7 +65,7 @@ function App() {
 
       const currentQuestion = question;
 
-      const response = await fetch("http://localhost:3000/ask", {
+      const response = await fetch(`${API_URL}/ask`, {
         method: "POST",
 
         headers: {

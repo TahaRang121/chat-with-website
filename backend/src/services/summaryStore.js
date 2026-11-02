@@ -1,7 +1,10 @@
-const {
-  qdrant,
-  SUMMARY_COLLECTION_NAME
-} = require("./vectorDatabase");
+const { QdrantClient } = require("@qdrant/js-client-rest");
+
+const qdrant = new QdrantClient({
+  url: "http://localhost:6333"
+});
+
+const SUMMARY_COLLECTION_NAME = "website_summaries";
 
 async function saveSummary(websiteId, summary) {
   await qdrant.upsert(SUMMARY_COLLECTION_NAME, {
@@ -10,11 +13,12 @@ async function saveSummary(websiteId, summary) {
     points: [
       {
         id: websiteId,
+
         vector: [0],
 
         payload: {
-          websiteId,
-          summary
+          websiteId: websiteId,
+          summary: summary
         }
       }
     ]
